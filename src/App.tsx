@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { PowerInputForm } from './components/PowerInputForm';
@@ -30,6 +30,84 @@ interface TestData {
 function App() {
   const [testData, setTestData] = useState<TestData | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+
+  // Load saved data on mount and handle browser navigation
+  useEffect(() => {
+    const loadSavedData = () => {
+      const saved = localStorage.getItem('ftpTestData');
+      if (saved) {
+        try {
+          const parsedData = JSON.parse(saved);
+          setTestData(parsedData);
+          // Update URL hash to reflect state
+          if (window.location.hash !== '#results') {
+            window.history.pushState(null, '', '#results');
+          }
+        } catch (error) {
+          console.error('Error loading saved test data:', error);
+          localStorage.removeItem('ftpTestData');
+        }
+      }
+    };
+
+    // Handle browser back/forward navigation
+    const handleHashChange = () => {
+      const hash = window.location.hash;
+      console.log('Hash changed to:', hash); // Debug log
+      if (hash === '' || hash === '#') {
+        // User navigated to home - show form (but keep data in localStorage)
+        console.log('Navigating to form'); // Debug log
+        setTestData(null);
+      } else if (hash === '#results') {
+        // User navigated to results - load from localStorage if available
+        console.log('Navigating to results'); // Debug log
+        const saved = localStorage.getItem('ftpTestData');
+        if (saved) {
+          try {
+            const parsedData = JSON.parse(saved);
+            setTestData(parsedData);
+            console.log('Results loaded from localStorage'); // Debug log
+          } catch (error) {
+            console.error('Error loading saved test data:', error);
+            localStorage.removeItem('ftpTestData');
+            setTestData(null);
+          }
+        } else {
+          console.log('No saved data found'); // Debug log
+          setTestData(null);
+        }
+      }
+    };
+
+    // Load data on initial mount and check URL state
+    const initialHash = window.location.hash;
+    if (initialHash === '#results') {
+      loadSavedData();
+    } else {
+      // If not on results page, still check for saved data but don't force load
+      const saved = localStorage.getItem('ftpTestData');
+      if (saved && (initialHash === '' || initialHash === '#')) {
+        // If we have saved data but no specific hash, show results
+        try {
+          const parsedData = JSON.parse(saved);
+          setTestData(parsedData);
+          window.history.replaceState(null, '', '#results');
+        } catch (error) {
+          console.error('Error loading saved test data:', error);
+          localStorage.removeItem('ftpTestData');
+        }
+      }
+    }
+    
+    // Listen for hash changes and popstate events (back/forward navigation)
+    window.addEventListener('hashchange', handleHashChange);
+    window.addEventListener('popstate', handleHashChange);
+    
+    return () => {
+      window.removeEventListener('hashchange', handleHashChange);
+      window.removeEventListener('popstate', handleHashChange);
+    };
+  }, []);
 
   const handleAnalyze = (
     powerData: number[], 
@@ -78,6 +156,9 @@ function App() {
       // Save to localStorage for persistence
       localStorage.setItem('ftpTestData', JSON.stringify(newTestData));
       
+      // Update URL to results page
+      window.history.pushState(null, '', '#results');
+      
       console.log('Analysis complete:', {
         ftp: stats.classicFTP,
         hrData: heartRateData ? `${heartRateData.length} samples` : 'none',
@@ -90,6 +171,8 @@ function App() {
   const handleNewTest = () => {
     setTestData(null);
     localStorage.removeItem('ftpTestData');
+    // Update URL to show form using hash
+    window.history.pushState(null, '', '#');
   };
 
   const handleSaveResults = async () => {
@@ -113,20 +196,36 @@ function App() {
     document.body.appendChild(pdfContainer);
 
     try {
-      // Capture the content as canvas
+      // Capture the content as canvas with dynamic height
       const canvas = await html2canvas(pdfContainer, {
         width: 794,
-        height: 1123, // A4 height
         scale: 2,
-        backgroundColor: '#ffffff'
+        backgroundColor: '#ffffff',
+        useCORS: true,
+        allowTaint: true
       });
 
-      // Create PDF
+      // Create PDF with proper pagination
       const pdf = new jsPDF('p', 'mm', 'a4');
-      const imgWidth = 210; // A4 width in mm
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      const pageWidth = 210; // A4 width in mm
+      const pageHeight = 297; // A4 height in mm
+      const imgWidth = pageWidth;
+      const imgHeight = (canvas.height * pageWidth) / canvas.width;
       
-      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, imgWidth, imgHeight);
+      let heightLeft = imgHeight;
+      let position = 0;
+      
+      // Add first page
+      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+      
+      // Add additional pages if content exceeds A4 height
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
       
       // Generate filename with timestamp
       const date = new Date(testData.timestamp);

@@ -42,20 +42,36 @@ export const PDFExport = ({ testData }: PDFExportProps) => {
     document.body.appendChild(pdfContainer);
 
     try {
-      // Capture the content as canvas
+      // Capture the content as canvas with dynamic height
       const canvas = await html2canvas(pdfContainer, {
         width: 794,
-        height: 1123, // A4 height
         scale: 2,
-        backgroundColor: '#ffffff'
+        backgroundColor: '#ffffff',
+        useCORS: true,
+        allowTaint: true
       });
 
-      // Create PDF
+      // Create PDF with proper pagination
       const pdf = new jsPDF('p', 'mm', 'a4');
-      const imgWidth = 210; // A4 width in mm
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      const pageWidth = 210; // A4 width in mm
+      const pageHeight = 297; // A4 height in mm
+      const imgWidth = pageWidth;
+      const imgHeight = (canvas.height * pageWidth) / canvas.width;
       
-      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, imgWidth, imgHeight);
+      let heightLeft = imgHeight;
+      let position = 0;
+      
+      // Add first page
+      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+      
+      // Add additional pages if content exceeds A4 height
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
       
       // Generate filename with timestamp
       const date = new Date(testData.timestamp);
@@ -209,27 +225,128 @@ export function generatePDFContent(testData: TestData): string {
       </div>
       ` : ''}
 
+      <!-- Detailed Performance Statistics -->
+      <div style="margin-bottom: 30px;">
+        <h2 style="color: #374151; font-size: 22px; margin-bottom: 20px; border-left: 4px solid #8b5cf6; padding-left: 15px;">📊 Detailed Statistics</h2>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+          <div style="background: #f9fafb; padding: 15px; border-radius: 8px; text-align: center;">
+            <div style="font-size: 12px; color: #6b7280; margin-bottom: 5px;">Maximum Power</div>
+            <div style="font-size: 18px; font-weight: bold; color: #374151;">${stats.max}w</div>
+          </div>
+          <div style="background: #f9fafb; padding: 15px; border-radius: 8px; text-align: center;">
+            <div style="font-size: 12px; color: #6b7280; margin-bottom: 5px;">Minimum Power</div>
+            <div style="font-size: 18px; font-weight: bold; color: #374151;">${stats.min}w</div>
+          </div>
+          <div style="background: #f9fafb; padding: 15px; border-radius: 8px; text-align: center;">
+            <div style="font-size: 12px; color: #6b7280; margin-bottom: 5px;">Intensity Factor</div>
+            <div style="font-size: 18px; font-weight: bold; color: #374151;">${stats.intensityFactor}</div>
+          </div>
+        </div>
+
+        ${heartRateStats ? `
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+          <div style="background: #fef2f2; padding: 15px; border-radius: 8px; text-align: center;">
+            <div style="font-size: 12px; color: #991b1b; margin-bottom: 5px;">Max Heart Rate</div>
+            <div style="font-size: 18px; font-weight: bold; color: #dc2626;">${heartRateStats.max} bpm</div>
+          </div>
+          <div style="background: #fef2f2; padding: 15px; border-radius: 8px; text-align: center;">
+            <div style="font-size: 12px; color: #991b1b; margin-bottom: 5px;">Cardiac Drift</div>
+            <div style="font-size: 18px; font-weight: bold; color: #dc2626;">${heartRateStats.cardiacDrift} bpm/W</div>
+          </div>
+        </div>
+        ` : ''}
+      </div>
+
+      <!-- Coaching Insights -->
+      <div style="margin-bottom: 30px;">
+        <h2 style="color: #374151; font-size: 22px; margin-bottom: 20px; border-left: 4px solid #8b5cf6; padding-left: 15px;">💡 Performance Insights</h2>
+        
+        <div style="background: #f3f4f6; border-radius: 12px; padding: 20px;">
+          <div style="margin-bottom: 15px;">
+            <div style="font-size: 14px; font-weight: bold; color: #374151; margin-bottom: 8px;">Pacing Analysis</div>
+            <div style="font-size: 13px; color: #6b7280; line-height: 1.5;">
+              ${pacing.strategy === 'even' ? 'Excellent pacing! You maintained consistent power throughout the test, which is optimal for FTP testing.' : 
+                pacing.strategy === 'negative-split' ? 'You finished stronger than you started - great mental strength! Consider starting slightly harder for even better results.' :
+                pacing.strategy === 'positive-split' ? 'You started strong but faded towards the end. Try starting more conservatively to maintain power throughout the test.' :
+                'Your pacing shows some variability. Focus on maintaining steady effort for more accurate FTP measurement.'}
+            </div>
+          </div>
+          
+          ${stats.variabilityIndex > 1.1 ? `
+          <div style="margin-bottom: 15px;">
+            <div style="font-size: 14px; font-weight: bold; color: #dc2626; margin-bottom: 8px;">⚠️ Power Consistency</div>
+            <div style="font-size: 13px; color: #6b7280; line-height: 1.5;">
+              Your power output varied significantly (VI: ${stats.variabilityIndex}). For more accurate FTP testing, try to maintain steadier power output. This will give you a better estimate of your sustainable threshold power.
+            </div>
+          </div>
+          ` : stats.variabilityIndex > 1.05 ? `
+          <div style="margin-bottom: 15px;">
+            <div style="font-size: 14px; font-weight: bold; color: #f59e0b; margin-bottom: 8px;">📊 Power Consistency</div>
+            <div style="font-size: 13px; color: #6b7280; line-height: 1.5;">
+              Good power consistency (VI: ${stats.variabilityIndex}). Small improvements in maintaining steady effort could yield even more accurate results.
+            </div>
+          </div>
+          ` : `
+          <div style="margin-bottom: 15px;">
+            <div style="font-size: 14px; font-weight: bold; color: #10b981; margin-bottom: 8px;">✅ Excellent Consistency</div>
+            <div style="font-size: 13px; color: #6b7280; line-height: 1.5;">
+              Outstanding power consistency (VI: ${stats.variabilityIndex})! This indicates excellent pacing and provides a highly reliable FTP estimate.
+            </div>
+          </div>
+          `}
+
+          ${wattsPerKgStats ? `
+          <div>
+            <div style="font-size: 14px; font-weight: bold; color: #374151; margin-bottom: 8px;">🎯 Performance Level</div>
+            <div style="font-size: 13px; color: #6b7280; line-height: 1.5;">
+              Your power-to-weight ratio of ${wattsPerKgStats.classicFTPPerKg}w/kg places you in the <strong>${wattsPerKgStats.category}</strong> category (${wattsPerKgStats.percentile}th percentile). ${getPerformanceDescription()}
+            </div>
+          </div>
+          ` : ''}
+        </div>
+      </div>
+
       <!-- Training Zones -->
-      ${wattsPerKgStats ? `
       <div style="margin-bottom: 30px;">
         <h2 style="color: #374151; font-size: 22px; margin-bottom: 20px; border-left: 4px solid #8b5cf6; padding-left: 15px;">🎯 Your Training Zones</h2>
         
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 12px; margin-bottom: 15px;">
+          <div style="background: #dcfce7; padding: 12px; border-radius: 6px;">
+            <strong>Zone 1 (Active Recovery):</strong><br>
+            ${Math.round(stats.classicFTP * 0.55)} - ${Math.round(stats.classicFTP * 0.75)}w
+            <div style="font-size: 11px; color: #059669; margin-top: 4px;">Easy recovery rides</div>
+          </div>
+          <div style="background: #dbeafe; padding: 12px; border-radius: 6px;">
+            <strong>Zone 2 (Endurance):</strong><br>
+            ${Math.round(stats.classicFTP * 0.76)} - ${Math.round(stats.classicFTP * 0.90)}w
+            <div style="font-size: 11px; color: #2563eb; margin-top: 4px;">Base building efforts</div>
+          </div>
+          <div style="background: #fef3c7; padding: 12px; border-radius: 6px;">
+            <strong>Zone 3 (Tempo):</strong><br>
+            ${Math.round(stats.classicFTP * 0.91)} - ${Math.round(stats.classicFTP * 1.05)}w
+            <div style="font-size: 11px; color: #d97706; margin-top: 4px;">Steady rhythm rides</div>
+          </div>
+          <div style="background: #fed7aa; padding: 12px; border-radius: 6px;">
+            <strong>Zone 4 (Threshold):</strong><br>
+            ${Math.round(stats.classicFTP * 1.06)} - ${Math.round(stats.classicFTP * 1.20)}w
+            <div style="font-size: 11px; color: #ea580c; margin-top: 4px;">FTP intervals</div>
+          </div>
+        </div>
+        
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 12px;">
-          <div style="background: #dcfce7; padding: 10px; border-radius: 6px;">
-            <strong>Zone 1 (Active Recovery):</strong> ${Math.round(stats.classicFTP * 0.55)} - ${Math.round(stats.classicFTP * 0.75)}w
+          <div style="background: #fee2e2; padding: 12px; border-radius: 6px;">
+            <strong>Zone 5 (VO2 Max):</strong><br>
+            ${Math.round(stats.classicFTP * 1.21)} - ${Math.round(stats.classicFTP * 1.50)}w
+            <div style="font-size: 11px; color: #dc2626; margin-top: 4px;">High intensity intervals</div>
           </div>
-          <div style="background: #dbeafe; padding: 10px; border-radius: 6px;">
-            <strong>Zone 2 (Endurance):</strong> ${Math.round(stats.classicFTP * 0.76)} - ${Math.round(stats.classicFTP * 0.90)}w
-          </div>
-          <div style="background: #fef3c7; padding: 10px; border-radius: 6px;">
-            <strong>Zone 3 (Tempo):</strong> ${Math.round(stats.classicFTP * 0.91)} - ${Math.round(stats.classicFTP * 1.05)}w
-          </div>
-          <div style="background: #fed7aa; padding: 10px; border-radius: 6px;">
-            <strong>Zone 4 (Threshold):</strong> ${Math.round(stats.classicFTP * 1.06)} - ${Math.round(stats.classicFTP * 1.20)}w
+          <div style="background: #fce7f3; padding: 12px; border-radius: 6px;">
+            <strong>Zone 6 (Anaerobic):</strong><br>
+            ${Math.round(stats.classicFTP * 1.51)}w+
+            <div style="font-size: 11px; color: #be185d; margin-top: 4px;">Neuromuscular power</div>
           </div>
         </div>
       </div>
-      ` : ''}
 
       <!-- Footer -->
       <div style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #e5e7eb; text-align: center; color: #6b7280; font-size: 11px;">

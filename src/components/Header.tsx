@@ -23,7 +23,7 @@ export const Header = () => {
           
           {/* Title and Description */}
           <div className="flex-1 text-center md:text-left">
-            <h1 className="text-2xl md:text-3xl font-bold">FTP Test Analyzer</h1>
+            <h1 className="text-2xl md:text-3xl font-bold">FTP Test Analyser</h1>
             <p className="mt-2 text-gray-300 text-lg">Power analysis and FTP estimate</p>
           </div>
         </div>

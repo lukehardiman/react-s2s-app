@@ -59,7 +59,8 @@ export const DetailedStats = ({ stats, heartRateStats }: DetailedStatsProps) => 
 
       {/* Power Training Zones */}
       <div className="border-t pt-4 mt-4">
-        <h4 className="font-semibold text-gray-700 mb-3">Power Training Zones (based on FTP)</h4>
+        <h4 className="font-semibold text-gray-700 mb-2">Estimated Training Zones (based on FTP)</h4>
+        <p class="text-sm mb-3">Consult with a Science to Sport coach for accurate training zones based on metabolic testing.</p>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 text-sm">
           <div className="bg-blue-100 p-3 rounded">
             <p className="font-medium">Zone 1 (Active Recovery)</p>

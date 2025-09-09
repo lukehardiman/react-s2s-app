@@ -17,7 +17,7 @@ export const CoachingInsights = ({ pacing, stats }: CoachingInsightsProps) => {
 
   return (
     <div className="bg-white rounded-lg shadow-lg p-6">
-      <h3 className="text-xl font-bold mb-4 text-gray-800">Coaching Insights</h3>
+      <h3 className="text-xl font-bold mb-4 text-gray-800">Further Insights</h3>
       
       <div className="space-y-3">
         {pacing.insights.map((insight, index) => (

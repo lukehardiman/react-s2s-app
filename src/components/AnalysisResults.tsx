@@ -38,6 +38,14 @@ export const AnalysisResults = ({ testData }: AnalysisResultsProps) => {
       {/* Key Metrics */}
       <MetricsGrid stats={stats} pacing={pacing} heartRateStats={heartRateStats} />
 
+      {/* Watts per Kg Analysis (if weight provided) */}
+      {wattsPerKgStats && riderWeight && (
+        <WattsPerKgAnalysis 
+          wattsPerKgStats={wattsPerKgStats}
+          riderWeight={riderWeight}
+        />
+      )}
+
       {/* FTP Improvement Guide */}
       <div className="bg-white rounded-lg shadow-lg p-6">
         <div className="border-b border-gray-200 pb-4 mb-4">
@@ -73,14 +81,6 @@ export const AnalysisResults = ({ testData }: AnalysisResultsProps) => {
         elevationData={elevationData}
         averagePower={stats.average}
       />
-
-      {/* Watts per Kg Analysis (if weight provided) */}
-      {wattsPerKgStats && riderWeight && (
-        <WattsPerKgAnalysis 
-          wattsPerKgStats={wattsPerKgStats}
-          riderWeight={riderWeight}
-        />
-      )}
 
       {/* Heart Rate Analysis (if available) */}
       {heartRateData && heartRateStats && (

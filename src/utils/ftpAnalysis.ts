@@ -54,9 +54,19 @@ export interface PacingAnalysis {
 }
 
 // Detect if this is a long workout and extract best FTP segment
-export const extractBestFTPSegment = (powerData: number[], heartRateData?: number[], targetDurationMinutes: number = 20): { 
+export const extractBestFTPSegment = (
+  powerData: number[], 
+  heartRateData?: number[], 
+  targetDurationMinutes: number = 20,
+  speedData?: number[],
+  distanceData?: number[],
+  elevationData?: number[]
+): { 
   power: number[], 
-  heartRate?: number[], 
+  heartRate?: number[],
+  speed?: number[],
+  distance?: number[],
+  elevation?: number[],
   segmentInfo: { startTime: number, duration: number, reason: string }
 } => {
   const targetSeconds = targetDurationMinutes * 60;
@@ -67,6 +77,9 @@ export const extractBestFTPSegment = (powerData: number[], heartRateData?: numbe
     return {
       power: powerData,
       heartRate: heartRateData,
+      speed: speedData,
+      distance: distanceData,
+      elevation: elevationData,
       segmentInfo: {
         startTime: 0,
         duration: powerData.length,
@@ -80,6 +93,9 @@ export const extractBestFTPSegment = (powerData: number[], heartRateData?: numbe
     return {
       power: powerData,
       heartRate: heartRateData,
+      speed: speedData,
+      distance: distanceData,
+      elevation: elevationData,
       segmentInfo: {
         startTime: 0,
         duration: powerData.length,
@@ -108,6 +124,9 @@ export const extractBestFTPSegment = (powerData: number[], heartRateData?: numbe
   
   const bestPowerSegment = powerData.slice(bestStartIndex, bestStartIndex + windowSize);
   const bestHeartRateSegment = heartRateData?.slice(bestStartIndex, bestStartIndex + windowSize);
+  const bestSpeedSegment = speedData?.slice(bestStartIndex, bestStartIndex + windowSize);
+  const bestDistanceSegment = distanceData?.slice(bestStartIndex, bestStartIndex + windowSize);
+  const bestElevationSegment = elevationData?.slice(bestStartIndex, bestStartIndex + windowSize);
   
   const startTimeMinutes = Math.round(bestStartIndex / 60);
   const endTimeMinutes = Math.round((bestStartIndex + windowSize) / 60);
@@ -115,6 +134,9 @@ export const extractBestFTPSegment = (powerData: number[], heartRateData?: numbe
   return {
     power: bestPowerSegment,
     heartRate: bestHeartRateSegment,
+    speed: bestSpeedSegment,
+    distance: bestDistanceSegment,
+    elevation: bestElevationSegment,
     segmentInfo: {
       startTime: bestStartIndex,
       duration: windowSize,

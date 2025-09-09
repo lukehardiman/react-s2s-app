@@ -3,6 +3,7 @@ import { parseCSV, parseTrainingPeaksCSV } from '../utils/csvParser';
 import { parseFitFile, fitToParseData } from '../utils/fitParser';
 import { parseGPX, gpxToParseData } from '../utils/gpxParser';
 import { extractBestFTPSegment } from '../utils/ftpAnalysis';
+import { DataWarningModal } from './DataWarningModal';
 
 interface SegmentInfo {
   startTime: number;
@@ -32,6 +33,18 @@ export const PowerInputForm = ({ onAnalyze }: PowerInputFormProps) => {
   const [riderWeight, setRiderWeight] = useState<number | null>(null);
   const [generatedHRData, setGeneratedHRData] = useState<number[] | null>(null);
   const [fileInfo, setFileInfo] = useState<string | null>(null);
+  const [modalState, setModalState] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+    onCancel?: () => void;
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    onConfirm: () => {}
+  });
 
   const generateSampleData = () => {
     // Generate realistic FTP test data with some fade
@@ -135,8 +148,19 @@ export const PowerInputForm = ({ onAnalyze }: PowerInputFormProps) => {
       // Show warning but proceed
       const excess = values.length - expectedMinutes;
       console.warn(`Truncated ${excess} excess values for ${expectedMinutes}-minute test`);
-      alert(`Too much data provided. You entered ${values.length} minute${values.length === 1 ? '' : 's'} of data for a ${expectedMinutes}-minute test. Truncated ${excess} excess value${excess === 1 ? '' : 's'} from the end.`);
-      return { isValid: true, processedData: expanded };
+      
+      // Store the processed data and show modal
+      const processedData = expanded;
+      setModalState({
+        isOpen: true,
+        title: 'Data Truncation Warning',
+        message: `You provided ${values.length} minute${values.length === 1 ? '' : 's'} of data for a ${expectedMinutes}-minute test. We've automatically truncated ${excess} excess value${excess === 1 ? '' : 's'} from the end to proceed with the analysis.`,
+        onConfirm: () => {
+          // This will be handled when the modal confirms
+        }
+      });
+      
+      return { isValid: true, processedData, showModal: true };
     }
     
     // Not enough values
@@ -163,19 +187,27 @@ export const PowerInputForm = ({ onAnalyze }: PowerInputFormProps) => {
     
     // Check if this is a long workout file (more than 30 minutes)
     if (dataLengthMinutes > 30 && showLongFileDialog) {
-      const userChoice = confirm(
-        `This appears to be a ${Math.round(dataLengthMinutes)}-minute workout file. For FTP analysis, we recommend using a focused effort segment.\n\n` +
-        `• Click "OK" to auto-extract the best 20-minute segment\n` +
-        `• Click "Cancel" to analyze the full workout (may give less accurate FTP results)`
-      );
-      
-      if (userChoice) {
-        // Extract best segment
-        const extracted = extractBestFTPSegment(powerData, heartRateData, 20);
-        console.log('Extracted segment:', extracted.segmentInfo.reason);
-        onAnalyze(extracted.power, extracted.heartRate, riderWeight || undefined, extracted.segmentInfo, speedData, distanceData, elevationData);
-        return;
-      }
+      setModalState({
+        isOpen: true,
+        title: 'Long Workout File Detected',
+        message: `This appears to be a ${Math.round(dataLengthMinutes)}-minute workout file. For FTP analysis, we recommend using a focused effort segment.\n\n• "Extract Best Segment" will auto-extract the best 20-minute segment\n• "Analyze Full Workout" will analyze the entire file (may give less accurate FTP results)`,
+        onConfirm: () => {
+          // Extract best segment
+          const extracted = extractBestFTPSegment(powerData, heartRateData, 20, speedData, distanceData, elevationData);
+          console.log('Extracted segment:', extracted.segmentInfo.reason);
+          onAnalyze(extracted.power, extracted.heartRate, riderWeight || undefined, extracted.segmentInfo, extracted.speed, extracted.distance, extracted.elevation);
+        },
+        onCancel: () => {
+          // Use full workout
+          const fullWorkoutInfo: SegmentInfo = {
+            startTime: 0,
+            duration: powerData.length,
+            reason: `Full ${Math.round(dataLengthMinutes)}-minute workout analyzed`
+          };
+          onAnalyze(powerData, heartRateData, riderWeight || undefined, fullWorkoutInfo, speedData, distanceData, elevationData);
+        }
+      });
+      return;
     }
     
     // Use full data (either short file or user chose full analysis)
@@ -595,6 +627,19 @@ export const PowerInputForm = ({ onAnalyze }: PowerInputFormProps) => {
           </div>
         </div>
       </div>
+      
+      {/* Data Warning Modal */}
+      <DataWarningModal
+        isOpen={modalState.isOpen}
+        onClose={() => setModalState(prev => ({ ...prev, isOpen: false }))}
+        title={modalState.title}
+        message={modalState.message}
+        onConfirm={modalState.onConfirm}
+        onCancel={modalState.onCancel}
+        confirmText={modalState.title.includes('Long Workout') ? 'Extract Best Segment' : 'Continue Analysis'}
+        cancelText={modalState.title.includes('Long Workout') ? 'Analyze Full Workout' : 'Cancel'}
+        type={modalState.title.includes('Long Workout') ? 'choice' : 'warning'}
+      />
     </div>
   );
 };
