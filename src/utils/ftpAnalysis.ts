@@ -1,57 +1,4 @@
-export interface Stats {
-  average: number;
-  normalized: number;
-  max: number;
-  min: number;
-  variabilityIndex: string;
-  stdDev: number;
-  classicFTP: number;
-  normalizedFTP: number;
-}
-
-export interface HeartRateStats {
-  average: number;
-  max: number;
-  min: number;
-  lthr: number; // Lactate Threshold Heart Rate (avg of test)
-  hrDrift: number; // Percentage drift from first to last quarter
-  cardiacDrift: number; // HR increase per watt decrease
-}
-
-export interface WattsPerKgStats {
-  classicFTPPerKg: number;
-  normalizedFTPPerKg: number;
-  averagePowerPerKg: number;
-  maxPowerPerKg: number;
-  grade: string;
-  category: string;
-  percentile: number;
-  description: string;
-}
-
-export interface PerformanceGrade {
-  grade: string;
-  category: string;
-  minWattsPerKg: number;
-  maxWattsPerKg: number | null;
-  percentile: number;
-  description: string;
-}
-
-export interface Insight {
-  type: 'error' | 'warning' | 'success' | 'info';
-  message: string;
-  recommendation: string;
-}
-
-export interface PacingAnalysis {
-  score: number;
-  fadePct: string;
-  insights: Insight[];
-  avgFirstQuarter: number;
-  avgLastQuarter: number;
-  wattsLost: number;
-}
+import type { Stats, HeartRateStats, WattsPerKgStats, PerformanceGrade, Insight, PacingAnalysis } from './types';
 
 // Detect if this is a long workout and extract best FTP segment
 export const extractBestFTPSegment = (
@@ -192,16 +139,16 @@ export const calculateStats = (powerData: number[]): Stats => {
 export const analyzePacing = (powerData: number[]): PacingAnalysis => {
   const firstQuarter = powerData.slice(0, Math.floor(powerData.length / 4));
   const lastQuarter = powerData.slice(Math.floor(powerData.length * 3 / 4));
-  const firstHalf = powerData.slice(0, Math.floor(powerData.length / 2));
-  const secondHalf = powerData.slice(Math.floor(powerData.length / 2));
+  // const firstHalf = powerData.slice(0, Math.floor(powerData.length / 2));
+  // const secondHalf = powerData.slice(Math.floor(powerData.length / 2));
   
   const avgFirst = firstQuarter.reduce((a, b) => a + b, 0) / firstQuarter.length;
   const avgLast = lastQuarter.reduce((a, b) => a + b, 0) / lastQuarter.length;
-  const avgFirstHalf = firstHalf.reduce((a, b) => a + b, 0) / firstHalf.length;
-  const avgSecondHalf = secondHalf.reduce((a, b) => a + b, 0) / secondHalf.length;
+  // const avgFirstHalf = firstHalf.reduce((a, b) => a + b, 0) / firstHalf.length;
+  // const avgSecondHalf = secondHalf.reduce((a, b) => a + b, 0) / secondHalf.length;
   
   const fadePct = ((avgFirst - avgLast) / avgFirst) * 100;
-  const halfSplitPct = ((avgFirstHalf - avgSecondHalf) / avgFirstHalf) * 100;
+  // const halfSplitPct = ((avgFirstHalf - avgSecondHalf) / avgFirstHalf) * 100; // Currently unused
   
   // Pacing quality score (0-100)
   let score = 100;
@@ -392,5 +339,4 @@ export const calculateWattsPerKg = (stats: Stats, riderWeight: number): WattsPer
 
 export const getPerformanceGrades = (): PerformanceGrade[] => PERFORMANCE_GRADES;
 
-// Explicit re-exports to ensure TypeScript module resolution
-export type { HeartRateStats, Stats, PacingAnalysis, WattsPerKgStats, PerformanceGrade, Insight };
+// Types are imported from types.ts

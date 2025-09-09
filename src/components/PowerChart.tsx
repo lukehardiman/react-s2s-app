@@ -8,7 +8,7 @@ interface PowerChartProps {
   averagePower: number;
 }
 
-export const PowerChart = ({ powerData, heartRateData, speedData, elevationData, averagePower }: PowerChartProps) => {
+export const PowerChart = ({ powerData, speedData, elevationData, averagePower }: PowerChartProps) => {
   // Prepare data with 30-second rolling average for smoothed power analysis
   const chartData = powerData.map((power, index) => {
     // Calculate 30-second rolling average (15 points each side for 1Hz data)

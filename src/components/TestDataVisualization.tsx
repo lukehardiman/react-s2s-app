@@ -1,4 +1,4 @@
-import { Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine, Area, ComposedChart, AreaChart, BarChart, Bar } from 'recharts';
+import { Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine, ComposedChart, BarChart, Bar } from 'recharts';
 
 interface TestDataPoint {
   time: number; // seconds
@@ -206,7 +206,7 @@ export const TestDataVisualization = ({
             <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
             <XAxis 
               dataKey="range"
-              tick={{ fontSize: 10, angle: -45 }}
+              tick={{ fontSize: 10 }}
               textAnchor="end"
               height={60}
               interval={0}
@@ -216,7 +216,7 @@ export const TestDataVisualization = ({
               label={{ value: 'Time (seconds)', angle: -90, position: 'insideLeft' }}
             />
             <Tooltip 
-              formatter={(value: any, name: string) => {
+              formatter={(value: any) => {
                 const data = value;
                 return [
                   [`${data} seconds`, 'Time'],
