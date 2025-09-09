@@ -70,7 +70,7 @@ export const PowerChart = ({ powerData, heartRateData, speedData, elevationData,
               return [`${Math.round(value)}w`, name];
             }}
           />
-          <Legend />
+          <Legend wrapperStyle={{ paddingTop: '10px' }} />
           
           {/* Average power reference */}
           <ReferenceLine 
