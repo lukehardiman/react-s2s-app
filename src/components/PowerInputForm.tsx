@@ -23,7 +23,7 @@ interface PowerInputFormProps {
 }
 
 export const PowerInputForm = ({ onAnalyze }: PowerInputFormProps) => {
-  const [inputMethod, setInputMethod] = useState<'manual' | 'csv' | 'fit' | 'gpx'>('manual');
+  const [inputMethod, setInputMethod] = useState<'fit' | 'gpx' | 'csv' | 'manual'>('fit');
   const [manualData, setManualData] = useState('');
   const [duration, setDuration] = useState(20);
   const [csvFile, setCsvFile] = useState<File | null>(null);
@@ -294,8 +294,33 @@ export const PowerInputForm = ({ onAnalyze }: PowerInputFormProps) => {
   return (
     <div className="bg-white rounded-lg shadow-lg p-6">
       <h2 className="text-2xl font-bold mb-4 text-gray-800">Input Test Data</h2>
+      
+      {/* Disclaimer and Test Guidelines */}
+      <div className="mb-6 space-y-4">
+        {/* Disclaimer */}
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="flex items-start gap-3">
+            <div className="text-blue-600 mt-0.5">
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div>
+              <h3 className="text-sm font-semibold text-blue-800 mb-2">Get An Immediate FTP Estimate</h3>
+              <div className="text-sm text-blue-700 space-y-1">
+                <p>• <strong>Upload a 20-minute FTP test</strong> for most accurate FTP calculation</p>
+                <p>• <strong>Any ride duration works</strong> - we'll find the best 20 minute effort</p>
+                <p>• This tool provides <strong>general estimates</strong> - it's no substitute for professional coaching.</p>
+              </div>
+            </div>
+          </div>
+        </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      </div>
+
+      {/* Form Container */}
+      <div className="bg-white border border-gray-200 rounded-lg p-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
         {/* Rider Weight */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -325,32 +350,6 @@ export const PowerInputForm = ({ onAnalyze }: PowerInputFormProps) => {
             <label className="flex items-center">
               <input
                 type="radio"
-                value="manual"
-                checked={inputMethod === 'manual'}
-                onChange={(e) => {
-                  setInputMethod(e.target.value as 'manual');
-                  setFileInfo(null);
-                }}
-                className="mr-2"
-              />
-              Manual Entry
-            </label>
-            <label className="flex items-center">
-              <input
-                type="radio"
-                value="csv"
-                checked={inputMethod === 'csv'}
-                onChange={(e) => {
-                  setInputMethod(e.target.value as 'csv');
-                  setFileInfo(null);
-                }}
-                className="mr-2"
-              />
-              CSV Upload
-            </label>
-            <label className="flex items-center">
-              <input
-                type="radio"
                 value="fit"
                 checked={inputMethod === 'fit'}
                 onChange={(e) => {
@@ -374,6 +373,32 @@ export const PowerInputForm = ({ onAnalyze }: PowerInputFormProps) => {
               />
               GPX File (.gpx)
             </label>
+            <label className="flex items-center">
+              <input
+                type="radio"
+                value="csv"
+                checked={inputMethod === 'csv'}
+                onChange={(e) => {
+                  setInputMethod(e.target.value as 'csv');
+                  setFileInfo(null);
+                }}
+                className="mr-2"
+              />
+              CSV Upload
+            </label>          
+            <label className="flex items-center">
+              <input
+                type="radio"
+                value="manual"
+                checked={inputMethod === 'manual'}
+                onChange={(e) => {
+                  setInputMethod(e.target.value as 'manual');
+                  setFileInfo(null);
+                }}
+                className="mr-2"
+              />
+              Manual Entry
+            </label>              
           </div>
         </div>
 
@@ -519,7 +544,57 @@ export const PowerInputForm = ({ onAnalyze }: PowerInputFormProps) => {
         >
           Analyze Test
         </button>
-      </form>
+        </form>
+      </div>
+
+      {/* Horizontal Rule */}
+      <div className="my-6">
+        
+      </div>
+
+      {/* FTP Test Guide Video */}
+      <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+        <div className="flex items-start gap-3 mb-3">
+          <div className="text-purple-600 mt-0.5">
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z" />
+            </svg>
+          </div>
+          <div className="flex-1">
+            <h3 className="text-sm font-semibold text-gray-800 mb-1">🎯 New to FTP Testing?</h3>
+            <p className="text-sm text-gray-600 mb-3">
+              Get advice on how to do an effective FTP test here
+            </p>
+            
+            {/* Collapsible Video Section */}
+            <details className="group">
+              <summary className="cursor-pointer text-sm font-medium text-purple-600 hover:text-purple-700 transition-colors list-none flex items-center gap-2">
+                <svg className="w-4 h-4 transition-transform group-open:rotate-90" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                </svg>
+                Watch: How to Perform an FTP Test
+              </summary>
+              
+              <div className="mt-3 aspect-video bg-gray-100 rounded-lg overflow-hidden">
+                <iframe
+                  width="100%"
+                  height="100%"
+                  src="https://www.youtube.com/embed/FZnuvoeZDks"
+                  title="How to Perform an FTP Test - Competitive Cyclist Guide"
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscopy; picture-in-picture"
+                  allowFullScreen
+                  className="rounded-lg"
+                />
+              </div>
+              
+              <div className="mt-2 text-xs text-gray-500">
+                💡 <strong>Pro tip:</strong> Follow this protocol for the most accurate results, then upload your data here for analysis!
+              </div>
+            </details>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

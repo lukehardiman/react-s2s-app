@@ -5,6 +5,8 @@ import { PowerInputForm } from './components/PowerInputForm';
 import { AnalysisResults } from './components/AnalysisResults';
 import { TestDataVisualization } from './components/TestDataVisualization';
 import { calculateStats, analyzePacing, calculateWattsPerKg, calculateHeartRateStats } from './utils/ftpAnalysis';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 interface TestData {
   powerData: number[];
@@ -90,6 +92,53 @@ function App() {
     localStorage.removeItem('ftpTestData');
   };
 
+  const handleSaveResults = async () => {
+    if (!testData) return;
+
+    // Import the PDF generation logic from PDFExport component
+    const { generatePDFContent } = await import('./components/PDFExport');
+    
+    // Create a hidden container for PDF content
+    const pdfContainer = document.createElement('div');
+    pdfContainer.id = 'pdf-content';
+    pdfContainer.style.position = 'absolute';
+    pdfContainer.style.left = '-9999px';
+    pdfContainer.style.width = '794px'; // A4 width in pixels at 96 DPI
+    pdfContainer.style.backgroundColor = 'white';
+    pdfContainer.style.padding = '40px';
+    pdfContainer.style.fontFamily = 'Arial, sans-serif';
+
+    // Generate PDF content
+    pdfContainer.innerHTML = generatePDFContent(testData);
+    document.body.appendChild(pdfContainer);
+
+    try {
+      // Capture the content as canvas
+      const canvas = await html2canvas(pdfContainer, {
+        width: 794,
+        height: 1123, // A4 height
+        scale: 2,
+        backgroundColor: '#ffffff'
+      });
+
+      // Create PDF
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const imgWidth = 210; // A4 width in mm
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      
+      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, imgWidth, imgHeight);
+      
+      // Generate filename with timestamp
+      const date = new Date(testData.timestamp);
+      const filename = `FTP-Test-${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}.pdf`;
+      
+      pdf.save(filename);
+    } finally {
+      // Clean up
+      document.body.removeChild(pdfContainer);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
@@ -122,12 +171,24 @@ function App() {
                     </p>
                   )}
                 </div>
-                <button
-                  onClick={handleNewTest}
-                  className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition"
-                >
-                  New Test
-                </button>
+                <div className="flex gap-3">
+                  <button
+                    onClick={handleSaveResults}
+                    className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition flex items-center gap-2"
+                    title="Save test results as PDF"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                    </svg>
+                    Save Results
+                  </button>
+                  <button
+                    onClick={handleNewTest}
+                    className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition"
+                  >
+                    New Test
+                  </button>
+                </div>
               </div>
             </div>
             
