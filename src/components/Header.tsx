@@ -12,7 +12,10 @@ export const Header = () => {
               onError={(e) => {
                 // Fallback if logo fails to load
                 e.currentTarget.style.display = 'none';
-                e.currentTarget.nextElementSibling!.style.display = 'block';
+                const nextElement = e.currentTarget.nextElementSibling as HTMLElement;
+                if (nextElement) {
+                  nextElement.style.display = 'block';
+                }
               }}
             />
             {/* Fallback text logo */}

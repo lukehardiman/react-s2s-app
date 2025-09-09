@@ -188,7 +188,7 @@ export function generatePDFContent(testData: TestData): string {
           </div>
           <div style="background: #f9fafb; padding: 15px; border-radius: 8px; text-align: center;">
             <div style="font-size: 12px; color: #6b7280; margin-bottom: 5px;">Variability Index</div>
-            <div style="font-size: 20px; font-weight: bold; color: ${stats.variabilityIndex > 1.1 ? '#ef4444' : stats.variabilityIndex > 1.05 ? '#f59e0b' : '#10b981'};">${stats.variabilityIndex}</div>
+            <div style="font-size: 20px; font-weight: bold; color: ${Number(stats.variabilityIndex) > 1.1 ? '#ef4444' : Number(stats.variabilityIndex) > 1.05 ? '#f59e0b' : '#10b981'};">${stats.variabilityIndex}</div>
           </div>
         </div>
 
@@ -219,7 +219,7 @@ export function generatePDFContent(testData: TestData): string {
           </div>
           <div style="background: #fef2f2; padding: 15px; border-radius: 8px; text-align: center;">
             <div style="font-size: 12px; color: #991b1b; margin-bottom: 5px;">HR Drift</div>
-            <div style="font-size: 20px; font-weight: bold; color: ${heartRateStats.hrDrift > 5 ? '#dc2626' : heartRateStats.hrDrift > 3 ? '#f59e0b' : '#16a34a'};">${heartRateStats.hrDrift}%</div>
+            <div style="font-size: 20px; font-weight: bold; color: ${Number(heartRateStats.hrDrift) > 5 ? '#dc2626' : Number(heartRateStats.hrDrift) > 3 ? '#f59e0b' : '#16a34a'};">${heartRateStats.hrDrift}%</div>
           </div>
         </div>
       </div>
@@ -273,14 +273,14 @@ export function generatePDFContent(testData: TestData): string {
             </div>
           </div>
           
-          ${stats.variabilityIndex > 1.1 ? `
+          ${Number(stats.variabilityIndex) > 1.1 ? `
           <div style="margin-bottom: 15px;">
             <div style="font-size: 14px; font-weight: bold; color: #dc2626; margin-bottom: 8px;">⚠️ Power Consistency</div>
             <div style="font-size: 13px; color: #6b7280; line-height: 1.5;">
               Your power output varied significantly (VI: ${stats.variabilityIndex}). For more accurate FTP testing, try to maintain steadier power output. This will give you a better estimate of your sustainable threshold power.
             </div>
           </div>
-          ` : stats.variabilityIndex > 1.05 ? `
+          ` : Number(stats.variabilityIndex) > 1.05 ? `
           <div style="margin-bottom: 15px;">
             <div style="font-size: 14px; font-weight: bold; color: #f59e0b; margin-bottom: 8px;">📊 Power Consistency</div>
             <div style="font-size: 13px; color: #6b7280; line-height: 1.5;">

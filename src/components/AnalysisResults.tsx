@@ -31,7 +31,7 @@ interface AnalysisResultsProps {
 }
 
 export const AnalysisResults = ({ testData }: AnalysisResultsProps) => {
-  const { powerData, heartRateData, speedData, distanceData, elevationData, stats, pacing, heartRateStats, wattsPerKgStats, riderWeight } = testData;
+  const { powerData, heartRateData, speedData, elevationData, stats, pacing, heartRateStats, wattsPerKgStats, riderWeight } = testData;
 
   return (
     <div className="space-y-6">
@@ -85,9 +85,7 @@ export const AnalysisResults = ({ testData }: AnalysisResultsProps) => {
       {/* Heart Rate Analysis (if available) */}
       {heartRateData && heartRateStats && (
         <HeartRateAnalysis 
-          heartRateData={heartRateData}
           heartRateStats={heartRateStats}
-          powerData={powerData}
         />
       )}
 

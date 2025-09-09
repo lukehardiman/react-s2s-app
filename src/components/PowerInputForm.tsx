@@ -160,7 +160,7 @@ export const PowerInputForm = ({ onAnalyze }: PowerInputFormProps) => {
         }
       });
       
-      return { isValid: true, processedData, showModal: true };
+      return { isValid: true, processedData };
     }
     
     // Not enough values

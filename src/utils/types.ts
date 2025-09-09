@@ -7,6 +7,7 @@ export interface Stats {
   stdDev: number;
   classicFTP: number;
   normalizedFTP: number;
+  intensityFactor: number;
 }
 
 export interface HeartRateStats {
@@ -51,4 +52,5 @@ export interface PacingAnalysis {
   avgFirstQuarter: number;
   avgLastQuarter: number;
   wattsLost: number;
+  strategy: string;
 }

@@ -1,12 +1,10 @@
 import type { HeartRateStats } from '../utils/types';
 
 interface HeartRateAnalysisProps {
-  heartRateData: number[];
   heartRateStats: HeartRateStats;
-  powerData: number[];
 }
 
-export const HeartRateAnalysis = ({ heartRateData, heartRateStats, powerData }: HeartRateAnalysisProps) => {
+export const HeartRateAnalysis = ({ heartRateStats }: HeartRateAnalysisProps) => {
   const getHRDriftColor = (drift: number) => {
     if (drift > 5) return 'text-red-600';
     if (drift > 3) return 'text-yellow-600';

@@ -184,7 +184,8 @@ export const calculateStats = (powerData: number[]): Stats => {
     variabilityIndex: vi.toFixed(3),
     stdDev: Math.round(stdDev),
     classicFTP: Math.round(avg * 0.95),
-    normalizedFTP: Math.round(normalizedPower * 0.95)
+    normalizedFTP: Math.round(normalizedPower * 0.95),
+    intensityFactor: Number(vi.toFixed(3))
   };
 };
 
@@ -274,13 +275,22 @@ export const analyzePacing = (powerData: number[]): PacingAnalysis => {
     });
   }
   
+  // Determine pacing strategy
+  let strategy = 'even';
+  if (fadePct > 5) {
+    strategy = 'positive-split'; // Started too hard, faded
+  } else if (fadePct < -3) {
+    strategy = 'negative-split'; // Got stronger
+  }
+
   return {
     score: Math.max(0, score),
     fadePct: fadePct.toFixed(1),
     insights,
     avgFirstQuarter: Math.round(avgFirst),
     avgLastQuarter: Math.round(avgLast),
-    wattsLost
+    wattsLost,
+    strategy
   };
 };
 
