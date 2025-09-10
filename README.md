@@ -1,11 +1,11 @@
-# Science to Sport FTP Analyzer
+# Science to Sport FTP Analyser
 
 A professional React-based cycling FTP (Functional Threshold Power) analysis tool for Science to Sport's internal use. This application provides comprehensive power data analysis, educational content, and detailed performance insights for cyclists.
 
 ## 🚴‍♂️ Features
 
 ### Core Analysis
-- **FTP Calculation**: Classic and Normalized Power-based FTP estimation
+- **FTP Calculation**: Classic and Normalised Power-based FTP estimation
 - **Pacing Analysis**: Detailed pacing strategy evaluation with coaching insights
 - **Power Metrics**: Comprehensive power statistics including Variability Index and Intensity Factor
 - **Heart Rate Analysis**: LTHR estimation, cardiac drift, and HR zone analysis
@@ -27,7 +27,7 @@ A professional React-based cycling FTP (Functional Threshold Power) analysis too
 - **Browser State Management**: Full localStorage persistence with URL navigation
 - **Responsive Design**: Works on desktop and mobile devices
 - **Modal System**: Professional UI components replacing browser alerts
-- **Real-time Visualization**: Interactive charts with power smoothing and elevation profiles
+- **Real-time Visualisation**: Interactive charts with power smoothing and elevation profiles
 
 ## 🛡️ Privacy & Security
 
@@ -41,15 +41,15 @@ This tool is designed for internal Science to Sport use and includes:
 ### Core Framework
 - **React 19**: Latest React with concurrent features and improved TypeScript support
 - **TypeScript**: Full type safety and enhanced developer experience
-- **Vite**: Lightning-fast build tool with HMR and optimized production builds
+- **Vite**: Lightning-fast build tool with HMR and optimised production builds
 
 ### Styling & UI
 - **Tailwind CSS**: Utility-first CSS framework for responsive design
 - **Custom Components**: Modal system, form validation, and professional layouts
 
-### Data Visualization
+### Data Visualisation
 - **Recharts**: Comprehensive charting library built on D3.js
-  - Power curve visualization with 30-second smoothing
+  - Power curve visualisation with 30-second smoothing
   - Heart rate overlay charts
   - Elevation profile integration
   - Interactive legends and tooltips
@@ -58,9 +58,9 @@ This tool is designed for internal Science to Sport use and includes:
 - **fit-file-parser**: Garmin FIT file parsing for cycling computer data
   - Power, heart rate, speed, distance extraction
   - GPS coordinate and elevation data processing
-  - Timestamp synchronization across data streams
+  - Timestamp synchronisation across data streams
 - **Custom Analysis Engine**: TypeScript-based FTP calculation algorithms
-  - Normalized Power calculation (30-second rolling average)
+  - Normalised Power calculation (30-second rolling average)
   - Pacing analysis and coaching insights generation
   - Performance grading system (Untrained to World Class)
 
@@ -129,7 +129,7 @@ npm run test:run
 
 ### Supported Metrics
 - **Classic FTP**: 95% of 20-minute average power
-- **Normalized Power FTP**: 95% of Normalized Power (accounts for variability)
+- **Normalised Power FTP**: 95% of Normalised Power (accounts for variability)
 - **Pacing Score**: 0-100 rating of pacing strategy execution
 - **Cardiac Drift**: Heart rate drift analysis (bpm/watt)
 - **Performance Grade**: A+ (World Class) to F (Untrained) classification
