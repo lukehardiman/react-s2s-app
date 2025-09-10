@@ -30,6 +30,7 @@ interface TestData {
 function App() {
   const [testData, setTestData] = useState<TestData | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
 
   // Load saved data on mount and handle browser navigation
   useEffect(() => {
@@ -176,13 +177,18 @@ function App() {
   };
 
   const handleSaveResults = async () => {
-    if (!testData) return;
+    if (!testData || isGeneratingPDF) return;
 
-    // Import the PDF generation logic from PDFExport component
-    const { generatePDFContent } = await import('./components/PDFExport');
+    setIsGeneratingPDF(true);
     
-    // Create a hidden container for PDF content
-    const pdfContainer = document.createElement('div');
+    let pdfContainer: HTMLDivElement | null = null;
+    
+    try {
+      // Import the PDF generation logic from PDFExport component
+      const { generatePDFContent } = await import('./components/PDFExport');
+      
+      // Create a hidden container for PDF content
+      pdfContainer = document.createElement('div');
     pdfContainer.id = 'pdf-content';
     pdfContainer.style.position = 'absolute';
     pdfContainer.style.left = '-9999px';
@@ -195,7 +201,6 @@ function App() {
     pdfContainer.innerHTML = generatePDFContent(testData);
     document.body.appendChild(pdfContainer);
 
-    try {
       // Capture the content as canvas with dynamic height
       const canvas = await html2canvas(pdfContainer, {
         width: 794,
@@ -232,9 +237,15 @@ function App() {
       const filename = `FTP-Test-${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}.pdf`;
       
       pdf.save(filename);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      // Optionally show error message to user
     } finally {
       // Clean up
-      document.body.removeChild(pdfContainer);
+      if (pdfContainer && document.body.contains(pdfContainer)) {
+        document.body.removeChild(pdfContainer);
+      }
+      setIsGeneratingPDF(false);
     }
   };
 
@@ -251,6 +262,16 @@ function App() {
               <span className="text-lg font-medium text-gray-700">Analyzing your test data...</span>
             </div>
             <p className="text-gray-500 mt-2">Calculating FTP, pacing analysis, and performance metrics</p>
+          </div>
+        )}
+        
+        {isGeneratingPDF && (
+          <div className="bg-white rounded-lg shadow-lg p-8 text-center">
+            <div className="flex items-center justify-center space-x-3">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+              <span className="text-lg font-medium text-gray-700">Generating PDF report...</span>
+            </div>
+            <p className="text-gray-500 mt-2">Creating your professional test analysis document</p>
           </div>
         )}
         
@@ -273,17 +294,31 @@ function App() {
                 <div className="flex gap-3">
                   <button
                     onClick={handleSaveResults}
-                    className="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition flex items-center gap-2"
-                    title="Save test results as PDF"
+                    disabled={isGeneratingPDF}
+                    className={`px-4 py-2 text-white rounded-md transition flex items-center gap-2 ${
+                      isGeneratingPDF 
+                        ? 'bg-gray-400 cursor-not-allowed' 
+                        : 'bg-gray-600 hover:bg-gray-700'
+                    }`}
+                    title={isGeneratingPDF ? "Generating PDF..." : "Save test results as PDF"}
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-                    </svg>
-                    Save Results
+                    {isGeneratingPDF ? (
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    ) : (
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                      </svg>
+                    )}
+                    {isGeneratingPDF ? 'Generating...' : 'Save Results'}
                   </button>
                   <button
                     onClick={handleNewTest}
-                    className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition"
+                    disabled={isGeneratingPDF}
+                    className={`px-4 py-2 text-white rounded-md transition ${
+                      isGeneratingPDF 
+                        ? 'bg-gray-400 cursor-not-allowed' 
+                        : 'bg-purple-600 hover:bg-purple-700'
+                    }`}
                   >
                     New Test
                   </button>
@@ -299,7 +334,7 @@ function App() {
             />
             
             {/* Analysis Results */}
-            <AnalysisResults testData={testData} />
+            <AnalysisResults testData={testData} isGeneratingPDF={isGeneratingPDF} />
           </div>
         )}
       </main>

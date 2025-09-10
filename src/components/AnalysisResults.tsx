@@ -28,9 +28,10 @@ interface TestData {
 
 interface AnalysisResultsProps {
   testData: TestData;
+  isGeneratingPDF?: boolean;
 }
 
-export const AnalysisResults = ({ testData }: AnalysisResultsProps) => {
+export const AnalysisResults = ({ testData, isGeneratingPDF }: AnalysisResultsProps) => {
   const { powerData, heartRateData, speedData, elevationData, stats, pacing, heartRateStats, wattsPerKgStats, riderWeight } = testData;
 
   return (
@@ -96,7 +97,7 @@ export const AnalysisResults = ({ testData }: AnalysisResultsProps) => {
       <CoachingInsights pacing={pacing} stats={stats} />
 
       {/* PDF Export */}
-      <PDFExport testData={testData} />
+      <PDFExport testData={testData} isGeneratingPDF={isGeneratingPDF} />
     </div>
   );
 };
