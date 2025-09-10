@@ -1,84 +1,26 @@
-# Block popular search engine bots and crawlers from indexing this content
-# Science to Sport React FTP Analyzer - Internal Tool
+# Block search engine bots and crawlers from indexing this content
+# FTP Analyser - Internal Tool
 
-# Block major search engines
-User-agent: Googlebot
-Disallow: /
+# Simple bot blocking without server-specific modules
+RewriteEngine On
 
-User-agent: Bingbot
-Disallow: /
+# Block major search engine bots
+RewriteCond %{HTTP_USER_AGENT} (googlebot|bingbot|slurp|duckduckbot|baiduspider|yandexbot) [NC]
+RewriteRule .* - [F,L]
 
-User-agent: Slurp
-Disallow: /
+# Block social media crawlers  
+RewriteCond %{HTTP_USER_AGENT} (facebookexternalhit|twitterbot|linkedinbot|whatsapp) [NC]
+RewriteRule .* - [F,L]
 
-User-agent: DuckDuckBot
-Disallow: /
+# Block archiving bots
+RewriteCond %{HTTP_USER_AGENT} (ia_archiver|wayback|archive\.org_bot) [NC]
+RewriteRule .* - [F,L]
 
-User-agent: Baiduspider
-Disallow: /
+# Block SEO tools
+RewriteCond %{HTTP_USER_AGENT} (semrushbot|ahrefsbot|mj12bot|dotbot|blexbot) [NC]
+RewriteRule .* - [F,L]
 
-User-agent: YandexBot
-Disallow: /
-
-User-agent: facebookexternalhit
-Disallow: /
-
-User-agent: Twitterbot
-Disallow: /
-
-User-agent: LinkedInBot
-Disallow: /
-
-User-agent: WhatsApp
-Disallow: /
-
-User-agent: Applebot
-Disallow: /
-
-User-agent: ia_archiver
-Disallow: /
-
-User-agent: Wayback
-Disallow: /
-
-User-agent: archive.org_bot
-Disallow: /
-
-User-agent: SemrushBot
-Disallow: /
-
-User-agent: AhrefsBot
-Disallow: /
-
-User-agent: MJ12bot
-Disallow: /
-
-User-agent: DotBot
-Disallow: /
-
-User-agent: Screaming Frog SEO Spider
-Disallow: /
-
-User-agent: BLEXBot
-Disallow: /
-
-# Block all other bots by default
-User-agent: *
-Disallow: /
-
-# Additional security headers
+# Add X-Robots-Tag header if mod_headers is available
 <IfModule mod_headers.c>
-    # Prevent indexing via HTTP headers
-    Header always set X-Robots-Tag "noindex, nofollow, noarchive, nosnippet, noimageindex"
+    Header always set X-Robots-Tag "noindex, nofollow"
 </IfModule>
-
-# Prevent access to sensitive files
-<Files "*.json">
-    Order allow,deny
-    Deny from all
-</Files>
-
-<Files "*.log">
-    Order allow,deny
-    Deny from all
-</Files>
