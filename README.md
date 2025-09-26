@@ -1,6 +1,9 @@
 # Science to Sport FTP Analyser
 
-A professional React-based cycling FTP (Functional Threshold Power) analysis tool for Science to Sport's internal use. This application provides comprehensive power data analysis, educational content, and detailed performance insights for cyclists.
+**⚠️ ALPHA VERSION - MINIMUM VIABLE PRODUCT**
+*This tool is in active development and not intended for commercial use.*
+
+A React-based cycling FTP (Functional Threshold Power) analysis tool for Science to Sport's internal use. This application provides comprehensive power data analysis, educational content, and detailed performance insights for cyclists.
 
 ## 🚴‍♂️ Features
 
@@ -17,8 +20,8 @@ A professional React-based cycling FTP (Functional Threshold Power) analysis too
 - **Smart Segment Detection**: Automatically extracts best 20-minute effort from longer workouts
 - **Data Validation**: Handles missing data and provides intelligent fallbacks
 
-### Professional Output
-- **PDF Export**: A4-formatted professional reports with cyclist-focused metrics
+### Output
+- **PDF Export**: A4-formatted reports with cyclist-focused metrics
 - **Educational Integration**: Expert coaching videos from Science to Sport team
 - **Performance Benchmarking**: Industry-standard performance grading system
 - **Coaching Insights**: Actionable recommendations for FTP improvement
@@ -26,7 +29,7 @@ A professional React-based cycling FTP (Functional Threshold Power) analysis too
 ### User Experience
 - **Browser State Management**: Full localStorage persistence with URL navigation
 - **Responsive Design**: Works on desktop and mobile devices
-- **Modal System**: Professional UI components replacing browser alerts
+- **Modal System**: Custom UI components replacing browser alerts
 - **Real-time Visualisation**: Interactive charts with power smoothing and elevation profiles
 
 ## 🛡️ Privacy & Security
@@ -45,7 +48,7 @@ This tool is designed for internal Science to Sport use and includes:
 
 ### Styling & UI
 - **Tailwind CSS**: Utility-first CSS framework for responsive design
-- **Custom Components**: Modal system, form validation, and professional layouts
+- **Custom Components**: Modal system, form validation, and custom layouts
 
 ### Data Visualisation
 - **Recharts**: Comprehensive charting library built on D3.js
@@ -68,7 +71,7 @@ This tool is designed for internal Science to Sport use and includes:
 - **jsPDF**: Client-side PDF generation with A4 formatting
 - **html2canvas**: DOM-to-canvas rendering for high-quality PDF layouts
   - Multi-page pagination handling
-  - Professional cycling-focused report templates
+  - Cycling-focused report templates
   - Embedded charts and performance metrics
 
 ### State Management & Persistence
@@ -141,7 +144,7 @@ npm run test:run
 
 ## 🏥 Use Cases
 
-- **Athlete Assessment**: Professional FTP testing and performance benchmarking
+- **Athlete Assessment**: FTP testing and performance benchmarking
 - **Coaching Analysis**: Detailed pacing and performance evaluation
 - **Progress Tracking**: Historical FTP development and trend analysis
 - **Education**: Learning tool with integrated expert coaching content
