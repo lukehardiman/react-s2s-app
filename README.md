@@ -148,13 +148,11 @@ npm run test:run
 
 ## 📋 Deployment
 
-Configured for deployment at: `https://www.sciencetosport.com/react-s2s-app/`
-
 The application includes production-ready configurations for subdirectory hosting with proper asset path handling.
 
 ## 🤝 Contributing
 
-This is a private Science to Sport internal tool. Development and maintenance by Luke Hardiman with AI assistance from Claude Code.
+This is a private Science to Sport internal tool. Development and maintenance by Luke Hardiman.
 
 ## 📄 License
 

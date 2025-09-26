@@ -271,7 +271,7 @@ function App() {
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
               <span className="text-lg font-medium text-gray-700">Generating PDF report...</span>
             </div>
-            <p className="text-gray-500 mt-2">Creating your professional test analysis document</p>
+            <p className="text-gray-500 mt-2">Creating your test analysis document</p>
           </div>
         )}
         
